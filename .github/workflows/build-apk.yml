@@ -1,0 +1,51 @@
+name: Build دليل الطالب APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: تحميل المشروع
+        uses: actions/checkout@v4
+
+      - name: إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: إعداد Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: فك ملف المشروع
+        run: |
+          unzip -o dalil-al-talib-final-branding.zip -d project
+
+      - name: تثبيت Capacitor
+        working-directory: project
+        run: npm install
+
+      - name: إنشاء Android
+        working-directory: project
+        run: npx cap add android
+
+      - name: مزامنة Android
+        working-directory: project
+        run: npx cap sync android
+
+      - name: بناء APK
+        working-directory: project/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: رفع APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: دليل-الطالب-APK
+          path: project/android/app/build/outputs/apk/debug/app-debug.apk
