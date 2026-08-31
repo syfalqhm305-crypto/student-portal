@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: تحميل المشروع
         uses: actions/checkout@v4
 
@@ -20,32 +21,101 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
+
+      - name: البحث عن ملف ZIP
+        run: |
+          echo "الملفات الموجودة:"
+          find . -maxdepth 3 -type f
+
+          ZIP_FILE=$(find . -type f -iname "*.zip" | head -n 1)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "❌ لم يتم العثور على ملف ZIP"
+            exit 1
+          fi
+
+          echo "✅ تم العثور على ملف:"
+          echo "$ZIP_FILE"
+
+          echo "ZIP_FILE=$ZIP_FILE" >> "$GITHUB_ENV"
 
       - name: فك ملف المشروع
         run: |
-          unzip -o dalil-al-talib-final-branding.zip -d project
+          rm -rf project
+          mkdir -p project
 
-      - name: تثبيت Capacitor
-        working-directory: project
-        run: npm install
+          unzip -o "$ZIP_FILE" -d project
 
-      - name: إنشاء Android
-        working-directory: project
-        run: npx cap add android
+          echo "محتويات المشروع:"
+          find project -maxdepth 3 -type f | head -100
 
-      - name: مزامنة Android
-        working-directory: project
-        run: npx cap sync android
+      - name: تحديد مجلد المشروع
+        run: |
+          if [ -f "project/package.json" ]; then
+            echo "PROJECT_DIR=project" >> "$GITHUB_ENV"
+          else
+            SUBDIR=$(find project -mindepth 1 -maxdepth 1 -type d | head -n 1)
+
+            if [ -z "$SUBDIR" ]; then
+              echo "❌ لم يتم العثور على مجلد المشروع"
+              exit 1
+            fi
+
+            echo "PROJECT_DIR=$SUBDIR" >> "$GITHUB_ENV"
+          fi
+
+      - name: تثبيت الحزم
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          npm install
+
+      - name: تثبيت Capacitor Android
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          npm install @capacitor/core@^8.0.0
+          npm install @capacitor/android@^8.0.0
+          npm install @capacitor/splash-screen@^8.0.0
+          npm install -D @capacitor/cli@^8.0.0
+
+      - name: إنشاء تطبيق Android
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          else
+            echo "Android موجود مسبقًا"
+          fi
+
+      - name: مزامنة Capacitor
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          npx cap sync android
+
+      - name: ضبط اسم التطبيق
+        working-directory: ${{ env.PROJECT_DIR }}/android
+        run: |
+          sed -i 's/<string name="app_name">.*<\/string>/<string name="app_name">دليل الطالب<\/string>/' app/src/main/res/values/strings.xml || true
 
       - name: بناء APK
-        working-directory: project/android
+        working-directory: ${{ env.PROJECT_DIR }}/android
         run: |
           chmod +x gradlew
+
           ./gradlew assembleDebug --no-daemon
+
+      - name: التأكد من APK
+        working-directory: ${{ env.PROJECT_DIR }}/android
+        run: |
+          echo "=============================="
+          echo "ملفات APK:"
+          echo "=============================="
+
+          find app/build/outputs/apk -type f -name "*.apk" -ls
 
       - name: رفع APK
         uses: actions/upload-artifact@v4
         with:
           name: دليل-الطالب-APK
-          path: project/android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.PROJECT_DIR }}/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
