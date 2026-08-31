@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>دليل الطالب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+/* ==================== إعدادات المشروع ==================== */
+/* غيّر هذي القيم الثلاث بعد ما تسوي مشروعك بـ Supabase */
+:root{}
+</style>
+<style id="app-css">
+:root{
+  --ink:#1C2B3A; --ink-2:#5B6B72; --paper:#EDF1E9; --paper-card:#FBFBF7;
+  --line:#CBD3C6; --brass:#C48A2E; --brass-dark:#9C6D1F; --danger:#A63D40; --good:#2F6B4F;
+}
+*{box-sizing:border-box;}
+body{margin:0; direction:rtl; font-family:'Tajawal',sans-serif; background:var(--paper); color:var(--ink);}
+.heading{font-family:'Cairo',sans-serif;}
+.wrap{max-width:480px; margin:0 auto; padding-bottom:60px;}
+.card{background:var(--paper-card); border:1px solid var(--line); border-radius:14px; box-shadow:0 1px 2px rgba(20,35,46,.05),0 14px 28px -18px rgba(20,35,46,.35); padding:16px; margin-bottom:14px;}
+.field{background:#fff; border:1px solid var(--line); border-radius:9px; padding:8px 10px; font-size:14px; font-family:'Tajawal',sans-serif; color:var(--ink); width:100%; outline:none; margin-bottom:8px;}
+.field:focus{border-color:var(--brass); box-shadow:0 0 0 3px rgba(196,138,46,.16);}
+.btn-primary{background:linear-gradient(135deg,#DEB662,#B5812A); color:#20170a; font-weight:800; font-size:14px; border:none; border-radius:9px; padding:10px 14px; cursor:pointer; width:100%;}
+.btn-primary:disabled{opacity:.4; cursor:not-allowed;}
+.btn-ghost{border:1px solid var(--line); border-radius:9px; padding:9px 14px; font-weight:700; font-size:14px; background:#fff; cursor:pointer;}
+.btn-icon{background:none; border:none; cursor:pointer; padding:4px; border-radius:6px;}
+.btn-icon:hover{background:rgba(0,0,0,.05);}
+.row{display:flex; gap:8px;}
+.row > *{flex:1;}
+.badge{display:inline-block; font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; border:1px solid;}
+.badge-ink{background:rgba(28,43,58,.07); color:var(--ink); border-color:rgba(28,43,58,.14);}
+.badge-brass{background:rgba(196,138,46,.14); color:var(--brass-dark); border-color:rgba(196,138,46,.35);}
+.badge-danger{background:rgba(166,61,64,.1); color:var(--danger); border-color:rgba(166,61,64,.3);}
+.badge-good{background:rgba(47,107,79,.12); color:var(--good); border-color:rgba(47,107,79,.32);}
+.empty{font-size:14px; padding:24px; text-align:center; border-radius:10px; border:1px dashed var(--line); color:var(--ink-2);}
+.hero{position:relative; overflow:hidden; background:linear-gradient(150deg,#16232E 0,#1E3648 55%,#234A54 100%); text-align:center; padding:40px 20px 34px;}
+.hero h1{font-size:30px; margin:10px 0 0;}
+.tabs{display:flex; gap:6px; overflow-x:auto; padding:10px 16px; background:var(--paper); position:sticky; top:0; z-index:5;}
+.tab-btn{white-space:nowrap; border:1px solid var(--line); background:var(--paper-card); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:800; cursor:pointer; color:var(--ink);}
+.tab-btn.active{background:linear-gradient(135deg,#DEB662,#B5812A); color:#fff; border-color:transparent;}
+.top-bar{display:flex; justify-content:space-between; align-items:center; padding:14px 16px 0;}
+.dept-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.dept-btn{border:1px solid var(--line); background:#fff; border-radius:12px; padding:10px 12px; text-align:right; font-weight:700; cursor:pointer; font-size:14px;}
+.dept-btn.active{background:linear-gradient(135deg,#DEB662,#B5812A); color:#fff; border-color:transparent;}
+.modal-bg{position:fixed; inset:0; background:rgba(20,26,20,.55); display:flex; align-items:center; justify-content:center; padding:16px; z-index:50;}
+.modal{background:var(--paper-card); border-radius:14px; padding:20px; width:100%; max-width:380px;}
+.entry-row{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; background:var(--paper-card); border:1px solid var(--line); margin-bottom:6px;}
+.day-title{font-size:12px; font-weight:800; margin:10px 0 6px; color:var(--brass-dark);}
+a{color:var(--brass-dark);}
+.upload-box{border:1.5px dashed var(--line); border-radius:10px; padding:14px; text-align:center; margin-bottom:10px;}
+.draft-row{display:grid; grid-template-columns:repeat(2,1fr); gap:6px; padding:10px; border:1px solid var(--line); border-radius:10px; margin-bottom:8px; background:#fff;}
+.draft-row input{font-size:13px; padding:6px 8px;}
+.small-muted{font-size:12px; color:var(--ink-2);}
+</style>
+</head>
+<body>
+<div id="app" class="wrap"></div>
+
+<script type="module">
+/* ==================== ١) إعدادات الاتصال — عدّلها ==================== */
+const SUPABASE_URL = "https://tdiovnmkmxjrkekwiivs.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_SZUczAnTFdZ45dVAlErE4A_zcuzf4th";
+const EDGE_FUNCTION_URL = SUPABASE_URL + "/functions/v1/extract-image";
+/* ======================================================================= */
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+window.addEventListener("error", (e)=> alert("خطأ بالصفحة: " + e.message));
+window.addEventListener("unhandledrejection", (e)=> alert("خطأ: " + (e.reason?.message || e.reason)));
+
+const DAYS = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const dayIdx = d => DAYS.indexOf(d);
+const todayName = () => DAYS[new Date().getDay()];
+const nowMin = () => { const d=new Date(); return d.getHours()*60+d.getMinutes(); };
+const t2m = t => { if(!t) return 0; const [h,m]=t.split(":").map(Number); return h*60+m; };
+const fmt12 = t => { if(!t) return ""; const [h,m]=t.split(":").map(Number); const p=h<12?"ص":"م"; let hh=h%12; if(hh===0) hh=12; return `${hh}:${String(m).padStart(2,"0")} ${p}`; };
+
+let S = {
+  view: "loading",           // loading | select | dash | admin
+  structure: [],             // colleges -> departments -> years (nested)
+  sel: null,                 // {collegeId, deptId, yearId}
+  tab: "schedule",
+  repMode: false,
+  showRepLogin: false,
+  showAdminLogin: false,
+  data: {},                  // cache for current dashboard tab
+  draft: null,               // {type:'grades'|'schedule', rows:[...]}
+  busy: false,
+};
+
+const app = document.getElementById("app");
+function render(){ app.innerHTML = View(); attach(); }
+
+/* ==================== تحميل البنية (كليات/أقسام/سنوات) ==================== */
+async function loadStructure(){
+  const { data: colleges } = await sb.from("colleges").select("*").order("name");
+  const { data: departments } = await sb.from("departments").select("*").order("name");
+  const { data: years } = await sb.from("years").select("*").order("name");
+  S.structure = (colleges||[]).map(c => ({
+    ...c,
+    departments: (departments||[]).filter(d=>d.college_id===c.id).map(d=>({
+      ...d, years: (years||[]).filter(y=>y.department_id===d.id)
+    }))
+  }));
+}
+
+function findYear(yearId){
+  for(const c of S.structure) for(const d of c.departments) for(const y of d.years)
+    if(y.id===yearId) return {college:c, dept:d, year:y};
+  return null;
+}
+
+/* ==================== VIEWS ==================== */
+function View(){
+  if(S.view==="loading") return `<div style="padding:60px 20px;text-align:center;color:var(--ink-2)">...جاري التحميل</div>`;
+  if(S.view==="select") return SelectView();
+  if(S.view==="dash") return DashView();
+  if(S.view==="admin") return AdminView();
+  return "";
+}
+
+function SelectView(){
+  const collegeId = S.sel?._collegeId || S.structure[0]?.id;
+  const college = S.structure.find(c=>c.id===collegeId);
+  const deptId = S.sel?._deptId || "";
+  const dept = college?.departments.find(d=>d.id===deptId);
+  const yearId = S.sel?._yearId || "";
+  return `
+  <div class="hero">
+    <div class="heading" style="color:#fff;font-weight:800;font-size:28px">دليل الطالب</div>
+    <div style="color:rgba(255,255,255,.72);font-size:13px;margin-top:6px">جداولك، تكاليفك، ودرجاتك — في مكان واحد</div>
+  </div>
+  <div style="padding:16px">
+    <div class="card">
+      ${S.structure.length>1?`
+      <label class="small-muted"><b>الكلية</b></label>
+      <select class="field" id="pick-college">
+        ${S.structure.map(c=>`<option value="${c.id}" ${c.id===collegeId?"selected":""}>${c.name}</option>`).join("")}
+      </select>`:""}
+      <label class="small-muted"><b>القسم</b></label>
+      <div class="dept-grid" style="margin-bottom:12px">
+        ${(college?.departments||[]).map(d=>`
+          <button class="dept-btn ${d.id===deptId?"active":""}" data-pick-dept="${d.id}">${d.name}</button>
+        `).join("") || `<div class="empty">لا توجد أقسام بعد</div>`}
+      </div>
+      ${dept?`
+      <label class="small-muted"><b>السنة الدراسية</b></label>
+      <div class="dept-grid" style="margin-bottom:12px">
+        ${dept.years.map(y=>`<button class="dept-btn ${y.id===yearId?"active":""}" data-pick-year="${y.id}">${y.name}</button>`).join("") || `<div class="empty">لا توجد سنوات بعد</div>`}
+      </div>`:""}
+      <button class="btn-primary" id="btn-enter" ${(!deptId||!yearId)?"disabled":""}>دخول ←</button>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn-ghost" id="btn-open-admin">⚙️ لوحة التحكم العامة</button>
+    </div>
+  </div>`;
+}
+
+const TABS = [
+  {id:"schedule", label:"الجدول"},
+  {id:"doctor", label:"بحث دكتور"},
+  {id:"assignments", label:"التكاليف"},
+  {id:"books", label:"الكتب"},
+  {id:"attendance", label:"الحضور"},
+  {id:"grades", label:"الدرجات"},
+  {id:"announcements", label:"الإعلانات"},
+];
+
+function DashView(){
+  const ctx = findYear(S.sel.yearId);
+  return `
+  <div class="top-bar">
+    <button class="btn-ghost" id="btn-back">→ تغيير</button>
+    ${S.repMode
+      ? `<button class="btn-ghost" id="btn-exit-rep">🔓 وضع المندوب (خروج)</button>`
+      : `<button class="btn-ghost" id="btn-rep-login">🔐 دخول مندوب</button>`}
+  </div>
+  <div style="padding:6px 16px 0">
+    <div class="heading" style="font-weight:800;font-size:19px">${ctx.dept.name}</div>
+    <div class="small-muted">${ctx.college.name} — ${ctx.year.name}</div>
+  </div>
+  <div class="tabs">
+    ${TABS.map(t=>`<button class="tab-btn ${S.tab===t.id?"active":""}" data-tab="${t.id}">${t.label}</button>`).join("")}
+  </div>
+  <div style="padding:0 16px">
+    ${TabBody()}
+  </div>
+  ${S.showRepLogin ? RepLoginModal() : ""}
+  `;
+}
+
+function TabBody(){
+  const d = S.data;
+  if(S.tab==="schedule") return ScheduleTab(d.schedule||[]);
+  if(S.tab==="doctor") return DoctorTab();
+  if(S.tab==="assignments") return AssignmentsTab(d.assignments||[]);
+  if(S.tab==="books") return BooksTab(d.books||[]);
+  if(S.tab==="attendance") return AttendanceTab();
+  if(S.tab==="grades") return GradesTab();
+  if(S.tab==="announcements") return AnnouncementsTab(d.announcements||[]);
+  return "";
+}
+
+/* ==================== الجدول الدراسي ==================== */
+function ScheduleTab(entries){
+  const sorted = [...entries].sort((a,b)=> dayIdx(a.day)-dayIdx(b.day) || t2m(a.start_time)-t2m(b.start_time));
+  const days = DAYS.filter(dy=>sorted.some(e=>e.day===dy));
+  return `
+  <div class="card">
+    ${sorted.length===0 ? `<div class="empty">لا توجد محاضرات أو اختبارات مضافة بعد</div>` :
+      days.map(dy=>`
+        <div class="day-title">${dy}</div>
+        ${sorted.filter(e=>e.day===dy).map(e=>`
+          <div class="entry-row">
+            <div>
+              <div style="font-weight:700;font-size:14px">${e.subject}</div>
+              <div class="small-muted">${e.doctor||""} ${e.room?"· قاعة "+e.room:""}</div>
+            </div>
+            <div style="text-align:left">
+              <div style="font-size:12px;font-weight:800">${fmt12(e.start_time)} – ${fmt12(e.end_time)}</div>
+              <span class="badge ${e.type==='اختبار'?'badge-brass':'badge-ink'}">${e.type}</span>
+              ${S.repMode?`<div><button class="btn-icon" data-del-schedule="${e.id}">🗑️</button></div>`:""}
+            </div>
+          </div>
+        `).join("")}
+      `).join("")
+    }
+  </div>
+  ${S.repMode ? `
+  <div class="card">
+    <b>إضافة حصة جديدة</b>
+    <div class="row" style="margin-top:10px">
+      <select class="field" id="sc-day">${DAYS.map(d=>`<option>${d}</option>`).join("")}</select>
+      <select class="field" id="sc-type"><option>محاضرة</option><option>اختبار</option></select>
+    </div>
+    <div class="row">
+      <input type="time" class="field" id="sc-start" value="08:00">
+      <input type="time" class="field" id="sc-end" value="09:00">
+    </div>
+    <input class="field" id="sc-subject" placeholder="اسم المادة">
+    <div class="row">
+      <input class="field" id="sc-doctor" placeholder="اسم الدكتور">
+      <input class="field" id="sc-room" placeholder="القاعة">
+    </div>
+    <button class="btn-primary" id="btn-add-schedule">إضافة</button>
+  </div>
+  <div class="card">
+    <b>📷 استخراج جدول اختبارات من صورة</b>
+    <p class="small-muted">ارفع صورة جدول الاختبارات، وراجع البيانات قبل الحفظ.</p>
+    <input type="file" accept="image/*" id="sc-image-input">
+    <button class="btn-ghost" id="btn-extract-schedule" style="margin-top:8px">استخراج البيانات</button>
+    ${S.busy ? `<div class="small-muted" style="margin-top:8px">...جاري التحليل</div>` : ""}
+  </div>
+  ${S.draft && S.draft.type==="schedule" ? DraftScheduleReview() : ""}
+  ` : ""}
+  `;
+}
+
+function DraftScheduleReview(){
+  return `
+  <div class="card" style="border-color:var(--brass)">
+    <b>مراجعة البيانات المستخرجة (مسودة)</b>
+    <p class="small-muted">عدّل أي خطأ قبل الحفظ.</p>
+    ${S.draft.rows.map((r,i)=>`
+      <div class="draft-row">
+        <input class="field" data-draft="${i}:day" value="${r.day||""}" placeholder="اليوم">
+        <select class="field" data-draft="${i}:type">
+          <option ${r.type!=="اختبار"?"selected":""}>محاضرة</option>
+          <option ${r.type==="اختبار"?"selected":""}>اختبار</option>
+        </select>
+        <input class="field" data-draft="${i}:start_time" value="${r.start_time||""}" placeholder="بداية HH:MM">
+        <input class="field" data-draft="${i}:end_time" value="${r.end_time||""}" placeholder="نهاية HH:MM">
+        <input class="field" data-draft="${i}:subject" value="${r.subject||""}" placeholder="المادة" style="grid-column:1/3">
+        <input class="field" data-draft="${i}:doctor" value="${r.doctor||""}" placeholder="الدكتور">
+        <input class="field" data-draft="${i}:room" value="${r.room||""}" placeholder="القاعة">
+      </div>
+    `).join("")}
+    <div class="row">
+      <button class="btn-primary" id="btn-save-draft-schedule">حفظ الكل</button>
+      <button class="btn-ghost" id="btn-cancel-draft">إلغاء</button>
+    </div>
+  </div>`;
+}
+
+/* ==================== بحث دكتور ==================== */
+function DoctorTab(){
+  const q = (S.doctorQuery||"").trim();
+  const list = S.doctorList || [];
+  const names = [...new Set(list.map(e=>e.doctor).filter(Boolean))].filter(n=>!q || n.includes(q)).sort();
+  const selected = S.doctorSelected;
+  let detail = "";
+  if(selected){
+    const entries = list.filter(e=>e.doctor===selected);
+    const today = todayName(), now = nowMin();
+    const todays = entries.filter(e=>e.day===today).sort((a,b)=>t2m(a.start_time)-t2m(b.start_time));
+    const current = todays.find(e=> now>=t2m(e.start_time) && now<t2m(e.end_time));
+    const next = todays.find(e=> t2m(e.start_time)>now && (!current||e.id!==current.id));
+    const week = [...entries].sort((a,b)=>dayIdx(a.day)-dayIdx(b.day)||t2m(a.start_time)-t2m(b.start_time));
+    detail = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>${selected}</b>
+        <button class="btn-ghost" id="btn-doctor-back">رجوع</button>
+      </div>
+      ${current ? `
+      <div style="background:rgba(166,61,64,.1);padding:10px;border-radius:10px;margin-top:10px">
+        <span class="badge badge-danger">مشغول الآن</span>
+        <div style="font-size:14px;margin-top:6px">يدرّس <b>${current.subject}</b> حتى ${fmt12(current.end_time)}</div>
+      </div>` : `
+      <div style="background:rgba(47,107,79,.12);padding:10px;border-radius:10px;margin-top:10px">
+        <span class="badge badge-good">متاح الآن</span>
+        ${next?`<div style="font-size:14px;margin-top:6px">حصته القادمة: <b>${next.subject}</b> الساعة ${fmt12(next.start_time)}</div>`:`<div class="small-muted" style="margin-top:6px">لا توجد حصص أخرى له اليوم</div>`}
+      </div>`}
+      <div class="small-muted" style="margin-top:14px;margin-bottom:6px"><b>الجدول الأسبوعي</b></div>
+      ${week.map(e=>`
+        <div class="entry-row">
+          <div><b>${e.day}</b> · ${e.subject}<div class="small-muted">${e.year_label||""}</div></div>
+          <div style="font-size:12px;font-weight:800">${fmt12(e.start_time)}–${fmt12(e.end_time)}</div>
+        </div>`).join("")}
+    </div>`;
+  }
+  return `
+  <input class="field" id="doctor-search-input" placeholder="ابحث عن اسم الدكتور" value="${q}">
+  ${!selected ? `
+  <div class="card" style="display:flex;flex-wrap:wrap;gap:8px">
+    ${names.length===0?`<div class="empty">${list.length? "لا يوجد دكتور بهذا الاسم":"جاري التحميل..."}</div>`:""}
+    ${names.map(n=>`<button class="btn-ghost" data-pick-doctor="${n}">${n}</button>`).join("")}
+  </div>` : detail}
+  `;
+}
+
+/* ==================== التكاليف ==================== */
+function AssignmentsTab(items){
+  const sorted=[...items].sort((a,b)=>(a.deadline||"").localeCompare(b.deadline||""));
+  return `
+  ${sorted.length===0?`<div class="empty">لا توجد تكاليف مضافة بعد</div>`:
+    sorted.map(i=>`
+    <div class="card" style="display:flex;justify-content:space-between;gap:8px">
+      <div>
+        <b>${i.title}</b>${i.subject?` <span class="small-muted">— ${i.subject}</span>`:""}
+        ${i.description?`<div class="small-muted" style="margin-top:4px">${i.description}</div>`:""}
+        ${i.deadline?`<div style="margin-top:6px"><span class="badge badge-brass">الموعد: ${i.deadline}</span></div>`:""}
+      </div>
+      ${S.repMode?`<button class="btn-icon" data-del-assignment="${i.id}">🗑️</button>`:""}
+    </div>`).join("")}
+  ${S.repMode?`
+  <div class="card">
+    <b>إضافة تكليف</b>
+    <input class="field" id="as-title" placeholder="عنوان التكليف" style="margin-top:8px">
+    <input class="field" id="as-subject" placeholder="المادة">
+    <textarea class="field" id="as-desc" placeholder="تفاصيل (اختياري)" rows="2"></textarea>
+    <input type="date" class="field" id="as-deadline">
+    <button class="btn-primary" id="btn-add-assignment">إضافة</button>
+  </div>`:""}
+  `;
+}
+
+/* ==================== الكتب ==================== */
+function BooksTab(items){
+  return `
+  ${items.length===0?`<div class="empty">لا توجد كتب أو ملازم مضافة بعد</div>`:
+    items.map(i=>`
+    <div class="card" style="display:flex;justify-content:space-between;gap:8px">
+      <div>
+        <b>${i.title}</b>
+        <div class="small-muted">${i.subject||""}</div>
+        <a href="${i.url}" target="_blank">فتح الملف</a>
+      </div>
+      ${S.repMode?`<button class="btn-icon" data-del-book="${i.id}">🗑️</button>`:""}
+    </div>`).join("")}
+  ${S.repMode?`
+  <div class="card">
+    <b>إضافة كتاب / ملزمة</b>
+    <p class="small-muted">أضف رابط الملف (Google Drive أو أي مستضيف).</p>
+    <input class="field" id="bk-subject" placeholder="المادة">
+    <input class="field" id="bk-title" placeholder="اسم الملف">
+    <input class="field" id="bk-url" placeholder="رابط الملف">
+    <button class="btn-primary" id="btn-add-book">إضافة</button>
+  </div>`:""}
+  `;
+}
+
+/* ==================== الإعلانات ==================== */
+function AnnouncementsTab(items){
+  const sorted=[...items].sort((a,b)=>(b.created_at||"").localeCompare(a.created_at||""));
+  return `
+  ${S.repMode?`
+  <div class="card">
+    <b>إعلان جديد</b>
+    <textarea class="field" id="an-text" rows="2" placeholder="اكتب نص الإعلان" style="margin-top:8px"></textarea>
+    <button class="btn-primary" id="btn-add-announcement">نشر</button>
+  </div>`:""}
+  ${sorted.length===0?`<div class="empty">لا توجد إعلانات حاليًا</div>`:
+    sorted.map(a=>`
+    <div class="card" style="display:flex;justify-content:space-between;gap:8px">
+      <div>${a.text}<div class="small-muted" style="margin-top:4px">${(a.created_at||"").slice(0,10)}</div></div>
+      ${S.repMode?`<button class="btn-icon" data-del-announcement="${a.id}">🗑️</button>`:""}
+    </div>`).join("")}
+  `;
+}
+
+/* ==================== الحضور ==================== */
+function AttendanceTab(){
+  const roster = S.data.roster || [];
+  const sessions = S.data.attendance || [];
+  const lookup = (S.attLookup||"").trim();
+  const found = roster.find(s=>s.id===lookup);
+  let pctHtml = "";
+  let sessHtml = "";
+  if(found){
+    const relevant = sessions.filter(s=> s.records && s.records[found.id]);
+    const present = relevant.filter(s=>s.records[found.id]==="حاضر").length;
+    const pct = relevant.length? Math.round(present/relevant.length*100) : null;
+    pctHtml = pct!==null ? `<span class="badge ${pct>=75?'badge-good':'badge-danger'}">نسبة الحضور: ${pct}%</span>` : "";
+    sessHtml = relevant.length===0 ? `<div class="small-muted">لا توجد جلسات مسجلة بعد</div>` :
+      relevant.map(s=>`
+      <div class="entry-row">
+        <span>${s.subject} · ${s.date}</span>
+        <span class="badge ${s.records[found.id]==='حاضر'?'badge-good':s.records[found.id]==='متأخر'?'badge-brass':'badge-danger'}">${s.records[found.id]}</span>
+      </div>`).join("");
+  }
+  return `
+  <div class="card">
+    <b>تحقق من حضورك</b>
+    <input class="field" id="att-lookup" placeholder="أدخل رقمك الجامعي" value="${lookup}" style="margin-top:8px">
+    ${lookup && !found ? `<div class="small-muted">لا يوجد طالب بهذا الرقم</div>` : ""}
+    ${found ? `<div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0"><b>${found.name}</b>${pctHtml}</div>${sessHtml}` : ""}
+  </div>
+  ${S.repMode?`
+  <div class="card">
+    <b>قائمة الطلاب (${roster.length})</b>
+    <div class="row" style="margin-top:8px">
+      <input class="field" id="ros-id" placeholder="الرقم الجامعي">
+      <input class="field" id="ros-name" placeholder="الاسم">
+      <button class="btn-primary" id="btn-add-student" style="flex:0 0 auto;width:44px">+</button>
+    </div>
+    <div style="max-height:150px;overflow:auto">
+      ${roster.map(s=>`<div class="entry-row"><span>${s.name} — ${s.id}</span><button class="btn-icon" data-del-student="${s.id}">🗑️</button></div>`).join("")}
+    </div>
+  </div>
+  <div class="card">
+    <b>إنشاء جلسة حضور</b>
+    <div class="row" style="margin-top:8px">
+      <input type="date" class="field" id="sess-date" value="${new Date().toISOString().slice(0,10)}">
+      <input class="field" id="sess-subject" placeholder="المادة">
+      <button class="btn-primary" id="btn-add-session" style="flex:0 0 auto;width:44px">+</button>
+    </div>
+  </div>
+  ${sessions.map(s=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between"><b>${s.subject} · ${s.date}</b><button class="btn-icon" data-del-session="${s.id}">🗑️</button></div>
+    ${roster.map(st=>`
+      <div class="entry-row">
+        <span>${st.name}</span>
+        <div class="row" style="flex:0 0 auto;gap:4px">
+          ${["حاضر","متأخر","غائب"].map(opt=>`
+            <button class="btn-ghost" style="padding:4px 8px;font-size:11px;${s.records&&s.records[st.id]===opt?'background:var(--ink);color:#fff':''}" data-set-status="${s.id}:${st.id}:${opt}">${opt}</button>
+          `).join("")}
+        </div>
+      </div>`).join("")}
+  </div>`).join("")}
+  `:""}
+  `;
+}
+
+/* ==================== الدرجات ==================== */
+function GradesTab(){
+  const roster = S.data.roster || [];
+  const grades = S.data.grades || []; // rows {student_id, subject, score}
+  const lookup = (S.gradeLookup||"").trim();
+  const foundName = roster.find(s=>s.id===lookup)?.name;
+  const foundGrades = grades.filter(g=>g.student_id===lookup);
+  return `
+  <div class="card">
+    <b>تحقق من درجاتك</b>
+    <input class="field" id="gr-lookup" placeholder="أدخل رقمك الجامعي" value="${lookup}" style="margin-top:8px">
+    ${lookup && foundGrades.length===0 ? `<div class="small-muted">لا توجد درجات مسجلة لهذا الرقم</div>` : ""}
+    ${foundGrades.length>0 ? `
+      ${foundName?`<b>${foundName}</b>`:""}
+      ${foundGrades.map(g=>`<div class="entry-row"><span>${g.subject}</span><span class="badge badge-brass">${g.score}</span></div>`).join("")}
+    `:""}
+  </div>
+  ${S.repMode?`
+  <div class="card">
+    <b>إدخال / تعديل درجة يدويًا</b>
+    <input class="field" id="gr-student" list="roster-list" placeholder="الرقم الجامعي للطالب" style="margin-top:8px">
+    <datalist id="roster-list">${roster.map(s=>`<option value="${s.id}">${s.name}</option>`).join("")}</datalist>
+    <div class="row">
+      <input class="field" id="gr-subject" placeholder="المادة">
+      <input class="field" id="gr-score" placeholder="الدرجة">
+      <button class="btn-primary" id="btn-add-grade" style="flex:0 0 auto;width:44px">+</button>
+    </div>
+  </div>
+  <div class="card">
+    <b>📷 استخراج جدول درجات من صورة</b>
+    <p class="small-muted">ارفع صورة كشف الدرجات، وراجعها قبل الحفظ.</p>
+    <input type="file" accept="image/*" id="gr-image-input">
+    <button class="btn-ghost" id="btn-extract-grades" style="margin-top:8px">استخراج البيانات</button>
+    ${S.busy ? `<div class="small-muted" style="margin-top:8px">...جاري التحليل</div>` : ""}
+  </div>
+  ${S.draft && S.draft.type==="grades" ? DraftGradesReview() : ""}
+  `:""}
+  `;
+}
+
+function DraftGradesReview(){
+  return `
+  <div class="card" style="border-color:var(--brass)">
+    <b>مراجعة الدرجات المستخرجة (مسودة)</b>
+    <p class="small-muted">عدّل أي خطأ قبل الحفظ.</p>
+    ${S.draft.rows.map((r,i)=>`
+      <div class="draft-row">
+        <input class="field" data-draft="${i}:student_id" value="${r.student_id||""}" placeholder="الرقم الجامعي">
+        <input class="field" data-draft="${i}:student_name" value="${r.student_name||""}" placeholder="اسم الطالب (اختياري)">
+        <input class="field" data-draft="${i}:subject" value="${r.subject||""}" placeholder="المادة">
+        <input class="field" data-draft="${i}:score" value="${r.score||""}" placeholder="الدرجة">
+      </div>
+    `).join("")}
+    <div class="row">
+      <button class="btn-primary" id="btn-save-draft-grades">حفظ الكل</button>
+      <button class="btn-ghost" id="btn-cancel-draft">إلغاء</button>
+    </div>
+  </div>`;
+}
+
+/* ==================== تسجيل دخول المندوب ==================== */
+function RepLoginModal(){
+  const hasCode = S._repHasCode;
+  return `
+  <div class="modal-bg" id="modal-bg">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <b>${hasCode?"دخول المندوب":"تسجيل مندوب جديد"}</b>
+        <button class="btn-icon" id="btn-close-modal">✕</button>
+      </div>
+      ${!hasCode?`<p class="small-muted">لا يوجد مندوب مسجَّل لهذا القسم/السنة. أنشئ رمز دخول.</p>`:""}
+      <input type="password" class="field" id="rep-code" placeholder="رمز الدخول">
+      ${!hasCode?`<input type="password" class="field" id="rep-code-confirm" placeholder="تأكيد الرمز">`:""}
+      <div id="rep-error" style="color:var(--danger);font-size:13px;margin-bottom:8px"></div>
+      <button class="btn-primary" id="btn-rep-submit">${hasCode?"دخول":"إنشاء وتسجيل الدخول"}</button>
+    </div>
+  </div>`;
+}
+
+/* ==================== لوحة التحكم العامة (المشرف) ==================== */
+function AdminView(){
+  return `
+  <div style="padding:16px">
+    <button class="btn-ghost" id="btn-admin-back">→ رجوع</button>
+    ${!S._adminOk ? AdminLoginInline() : AdminPanelBody()}
+  </div>`;
+}
+
+function AdminLoginInline(){
+  const hasCode = S._adminHasCode;
+  return `
+  <div class="card">
+    <b>${hasCode?"دخول المشرف العام":"تفعيل لوحة التحكم العامة"}</b>
+    ${!hasCode?`<p class="small-muted">لم يُعيَّن رمز مشرف بعد.</p>`:""}
+    <input type="password" class="field" id="admin-code" placeholder="رمز الدخول" style="margin-top:8px">
+    ${!hasCode?`<input type="password" class="field" id="admin-code-confirm" placeholder="تأكيد الرمز">`:""}
+    <div id="admin-error" style="color:var(--danger);font-size:13px;margin-bottom:8px"></div>
+    <button class="btn-primary" id="btn-admin-submit">${hasCode?"دخول":"إنشاء وتسجيل الدخول"}</button>
+  </div>`;
+}
+
+function AdminPanelBody(){
+  return `
+  <div class="heading" style="font-weight:800;font-size:20px;margin-bottom:12px">لوحة التحكم العامة</div>
+  <div class="card">
+    <b>إضافة كلية جديدة</b>
+    <div class="row" style="margin-top:8px">
+      <input class="field" id="new-college-name" placeholder="اسم الكلية">
+      <button class="btn-primary" id="btn-add-college" style="flex:0 0 auto;width:44px">+</button>
+    </div>
+  </div>
+  ${S.structure.map(c=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b>🏛️ ${c.name}</b>
+      <button class="btn-icon" data-del-college="${c.id}">🗑️</button>
+    </div>
+    ${c.departments.map(d=>`
+      <div style="margin-top:10px;padding-right:10px;border-right:2px solid var(--line)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span><b>${d.name}</b></span>
+          <button class="btn-icon" data-del-dept="${d.id}">🗑️</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">
+          ${d.years.map(y=>`<span class="badge badge-ink">${y.name} <button data-del-year="${y.id}" style="border:none;background:none;cursor:pointer">✕</button></span>`).join("")}
+        </div>
+        <div class="row">
+          <input class="field" data-new-year="${d.id}" placeholder="إضافة سنة" style="font-size:12px;padding:6px">
+          <button class="btn-ghost" data-add-year="${d.id}" style="font-size:12px">إضافة</button>
+        </div>
+      </div>
+    `).join("")}
+    <div class="row" style="margin-top:10px">
+      <input class="field" data-new-dept="${c.id}" placeholder="إضافة قسم جديد" style="font-size:12px;padding:6px">
+      <button class="btn-ghost" data-add-dept="${c.id}" style="font-size:12px">إضافة</button>
+    </div>
+  </div>`).join("")}
+  `;
+}
+
+/* ==================== تحميل بيانات لوحة الطالب حسب التبويب ==================== */
+async function loadTabData(){
+  const yearId = S.sel.yearId;
+  if(S.tab==="schedule"){
+    const {data} = await sb.from("schedule_entries").select("*").eq("year_id", yearId);
+    S.data.schedule = data||[];
+  } else if(S.tab==="doctor"){
+    // نجيب كل جداول كل الأقسام مع اسم القسم/السنة لعرضها بنتائج البحث
+    const {data} = await sb.from("schedule_entries").select("*, years(name, departments(name, colleges(name)))");
+    S.doctorList = (data||[]).map(e=>({...e, year_label: e.years ? `${e.years.departments?.name||""} — ${e.years.name}` : ""}));
+  } else if(S.tab==="assignments"){
+    const {data} = await sb.from("assignments").select("*").eq("year_id", yearId);
+    S.data.assignments = data||[];
+  } else if(S.tab==="books"){
+    const {data} = await sb.from("books").select("*").eq("year_id", yearId);
+    S.data.books = data||[];
+  } else if(S.tab==="announcements"){
+    const {data} = await sb.from("announcements").select("*").eq("year_id", yearId);
+    S.data.announcements = data||[];
+  } else if(S.tab==="attendance" || S.tab==="grades"){
+    const {data: roster} = await sb.from("students").select("*").eq("year_id", yearId);
+    S.data.roster = roster||[];
+    if(S.tab==="attendance"){
+      const {data: sessions} = await sb.from("attendance_sessions").select("*, attendance_records(*)").eq("year_id", yearId);
+      S.data.attendance = (sessions||[]).map(s=>({...s, records: Object.fromEntries((s.attendance_records||[]).map(r=>[r.student_id, r.status]))}));
+    } else {
+      const {data: grades} = await sb.from("grades").select("*").eq("year_id", yearId);
+      S.data.grades = grades||[];
+    }
+  }
+}
+
+/* ==================== أحداث ==================== */
+function attach(){
+  const on = (sel, ev, fn) => { const el = app.querySelector(sel); if(el) el.addEventListener(ev, fn); };
+  const onAll = (sel, ev, fn) => app.querySelectorAll(sel).forEach(el=>el.addEventListener(ev, fn));
+
+  if(S.view==="select"){
+    on("#pick-college", "change", e=>{ S.sel = {..._blankSel(), _collegeId:e.target.value}; render(); });
+    onAll("[data-pick-dept]", "click", e=>{ S.sel = {..._selOrBlank(), _deptId:e.target.dataset.pickDept, _yearId:""}; render(); });
+    onAll("[data-pick-year]", "click", e=>{ S.sel._yearId = e.target.dataset.pickYear; render(); });
+    on("#btn-enter", "click", async ()=>{
+      const s = S.sel;
+      const collegeId = s._collegeId || S.structure[0]?.id;
+      S.sel = {collegeId, deptId:s._deptId, yearId:s._yearId};
+      S.view="dash"; S.tab="schedule"; S.repMode=false; S.data={};
+      render();
+      await loadTabData(); render();
+    });
+    on("#btn-open-admin", "click", async ()=>{
+      const {data} = await sb.rpc("has_admin_code");
+      S._adminHasCode = !!data;
+      S._adminOk = false;
+      S.view="admin"; render();
+    });
+  }
+
+  if(S.view==="dash"){
+    on("#btn-back", "click", ()=>{ S.view="select"; S.sel=null; render(); });
+    onAll("[data-tab]", "click", async e=>{ S.tab = e.target.dataset.tab; S.draft=null; render(); await loadTabData(); render(); if(S.tab==="doctor"){} });
+    on("#btn-exit-rep", "click", ()=>{ S.repMode=false; render(); });
+    on("#btn-rep-login", "click", async ()=>{
+      const {data} = await sb.rpc("has_rep_code", {p_year_id: S.sel.yearId});
+      S._repHasCode = !!data; S.showRepLogin=true; render();
+    });
+    on("#btn-close-modal", "click", ()=>{ S.showRepLogin=false; render(); });
+    on("#modal-bg", "click", ()=>{ S.showRepLogin=false; render(); });
+    on("#btn-rep-submit", "click", async ()=>{
+      const code = app.querySelector("#rep-code").value.trim();
+      const err = app.querySelector("#rep-error");
+      if(S._repHasCode){
+        const {data} = await sb.rpc("check_rep_code", {p_year_id:S.sel.yearId, p_code:code});
+        if(data){ S.repMode=true; S.showRepLogin=false; render(); }
+        else err.textContent = "الرمز غير صحيح";
+      } else {
+        const confirm = app.querySelector("#rep-code-confirm").value.trim();
+        if(code.length<4){ err.textContent="اختر رمزًا من ٤ أحرف على الأقل"; return; }
+        if(code!==confirm){ err.textContent="الرمزان غير متطابقين"; return; }
+        await sb.from("rep_codes").insert({year_id:S.sel.yearId, code_hash:code});
+        S.repMode=true; S.showRepLogin=false; render();
+      }
+    });
+
+    /* الجدول */
+    on("#btn-add-schedule", "click", async ()=>{
+      const g = id=>app.querySelector(id).value;
+      const row = {year_id:S.sel.yearId, day:g("#sc-day"), type:g("#sc-type"), start_time:g("#sc-start"), end_time:g("#sc-end"), subject:g("#sc-subject").trim(), doctor:g("#sc-doctor").trim(), room:g("#sc-room").trim()};
+      if(!row.subject||!row.doctor) return;
+      await sb.from("schedule_entries").insert(row);
+      await loadTabData(); render();
+    });
+    onAll("[data-del-schedule]", "click", async e=>{
+      await sb.from("schedule_entries").delete().eq("id", e.target.dataset.delSchedule);
+      await loadTabData(); render();
+    });
+    on("#btn-extract-schedule", "click", ()=>runExtraction("schedule", "#sc-image-input"));
+
+    /* بحث دكتور */
+    on("#doctor-search-input", "input", e=>{ S.doctorQuery=e.target.value; render(); });
+    onAll("[data-pick-doctor]", "click", e=>{ S.doctorSelected=e.target.dataset.pickDoctor; render(); });
+    on("#btn-doctor-back", "click", ()=>{ S.doctorSelected=null; render(); });
+
+    /* التكاليف */
+    on("#btn-add-assignment", "click", async ()=>{
+      const g=id=>app.querySelector(id).value;
+      const title=g("#as-title").trim(); if(!title) return;
+      await sb.from("assignments").insert({year_id:S.sel.yearId, title, subject:g("#as-subject").trim(), description:g("#as-desc").trim(), deadline:g("#as-deadline")||null});
+      await loadTabData(); render();
+    });
+    onAll("[data-del-assignment]", "click", async e=>{ await sb.from("assignments").delete().eq("id", e.target.dataset.delAssignment); await loadTabData(); render(); });
+
+    /* الكتب */
+    on("#btn-add-book", "click", async ()=>{
+      const g=id=>app.querySelector(id).value;
+      const title=g("#bk-title").trim(), url=g("#bk-url").trim(); if(!title||!url) return;
+      await sb.from("books").insert({year_id:S.sel.yearId, subject:g("#bk-subject").trim(), title, url});
+      await loadTabData(); render();
+    });
+    onAll("[data-del-book]", "click", async e=>{ await sb.from("books").delete().eq("id", e.target.dataset.delBook); await loadTabData(); render(); });
+
+    /* الإعلانات */
+    on("#btn-add-announcement", "click", async ()=>{
+      const text = app.querySelector("#an-text").value.trim(); if(!text) return;
+      await sb.from("announcements").insert({year_id:S.sel.yearId, text});
+      await loadTabData(); render();
+    });
+    onAll("[data-del-announcement]", "click", async e=>{ await sb.from("announcements").delete().eq("id", e.target.dataset.delAnnouncement); await loadTabData(); render(); });
+
+    /* الحضور */
+    on("#att-lookup", "input", e=>{ S.attLookup=e.target.value; render(); });
+    on("#btn-add-student", "click", async ()=>{
+      const id=app.querySelector("#ros-id").value.trim(), name=app.querySelector("#ros-name").value.trim();
+      if(!id||!name) return;
+      await sb.from("students").insert({id, year_id:S.sel.yearId, name});
+      await loadTabData(); render();
+    });
+    onAll("[data-del-student]", "click", async e=>{ await sb.from("students").delete().eq("id", e.target.dataset.delStudent).eq("year_id", S.sel.yearId); await loadTabData(); render(); });
+    on("#btn-add-session", "click", async ()=>{
+      const date=app.querySelector("#sess-date").value, subject=app.querySelector("#sess-subject").value.trim();
+      if(!subject) return;
+      const {data} = await sb.from("attendance_sessions").insert({year_id:S.sel.yearId, date, subject}).select().single();
+      const roster = S.data.roster||[];
+      if(data && roster.length){
+        await sb.from("attendance_records").insert(roster.map(st=>({session_id:data.id, student_id:st.id, status:"حاضر"})));
+      }
+      await loadTabData(); render();
+    });
+    onAll("[data-del-session]", "click", async e=>{ await sb.from("attendance_sessions").delete().eq("id", e.target.dataset.delSession); await loadTabData(); render(); });
+    onAll("[data-set-status]", "click", async e=>{
+      const [sessionId, studentId, status] = e.target.dataset.setStatus.split(":");
+      await sb.from("attendance_records").upsert({session_id:sessionId, student_id:studentId, status});
+      await loadTabData(); render();
+    });
+
+    /* الدرجات */
+    on("#gr-lookup", "input", e=>{ S.gradeLookup=e.target.value; render(); });
+    on("#btn-add-grade", "click", async ()=>{
+      const g=id=>app.querySelector(id).value.trim();
+      const student_id=g("#gr-student"), subject=g("#gr-subject"), score=g("#gr-score");
+      if(!student_id||!subject||!score) return;
+      await sb.from("grades").upsert({student_id, year_id:S.sel.yearId, subject, score});
+      await loadTabData(); render();
+    });
+    on("#btn-extract-grades", "click", ()=>runExtraction("grades", "#gr-image-input"));
+
+    /* مراجعة المسودة (جدول أو درجات) */
+    onAll("[data-draft]", "input", e=>{
+      const [idx, field] = e.target.dataset.draft.split(":");
+      S.draft.rows[idx][field] = e.target.value;
+    });
+    on("#btn-cancel-draft", "click", ()=>{ S.draft=null; render(); });
+    on("#btn-save-draft-schedule", "click", async ()=>{
+      const rows = S.draft.rows.filter(r=>r.subject).map(r=>({year_id:S.sel.yearId, day:r.day, start_time:r.start_time, end_time:r.end_time, subject:r.subject, doctor:r.doctor||"", room:r.room||"", type:r.type||"محاضرة"}));
+      if(rows.length) await sb.from("schedule_entries").insert(rows);
+      S.draft=null; await loadTabData(); render();
+    });
+    on("#btn-save-draft-grades", "click", async ()=>{
+      const rows = S.draft.rows.filter(r=>r.student_id && r.subject).map(r=>({student_id:r.student_id, year_id:S.sel.yearId, subject:r.subject, score:r.score||""}));
+      if(rows.length) await sb.from("grades").upsert(rows);
+      S.draft=null; await loadTabData(); render();
+    });
+  }
+
+  if(S.view==="admin"){
+    on("#btn-admin-back", "click", ()=>{ S.view="select"; render(); });
+    on("#btn-admin-submit", "click", async ()=>{
+      const code = app.querySelector("#admin-code").value.trim();
+      const err = app.querySelector("#admin-error");
+      if(S._adminHasCode){
+        const {data} = await sb.rpc("check_admin_code", {p_code:code});
+        if(data){ S._adminOk=true; render(); } else err.textContent="الرمز غير صحيح";
+      } else {
+        const confirm = app.querySelector("#admin-code-confirm").value.trim();
+        if(code.length<4){ err.textContent="اختر رمزًا من ٤ أحرف على الأقل"; return; }
+        if(code!==confirm){ err.textContent="الرمزان غير متطابقين"; return; }
+        await sb.from("admin_code").upsert({id:1, code_hash:code});
+        S._adminOk=true; render();
+      }
+    });
+    if(S._adminOk){
+      on("#btn-add-college", "click", async ()=>{
+        const name = app.querySelector("#new-college-name").value.trim(); if(!name) return;
+        const {error} = await sb.from("colleges").insert({name});
+        if(error){ alert("خطأ بالإضافة: " + error.message); return; }
+        await loadStructure(); render();
+      });
+      onAll("[data-del-college]", "click", async e=>{
+        const {error} = await sb.from("colleges").delete().eq("id", e.target.dataset.delCollege);
+        if(error){ alert("خطأ بالحذف: " + error.message); return; }
+        await loadStructure(); render();
+      });
+      onAll("[data-del-dept]", "click", async e=>{
+        const {error} = await sb.from("departments").delete().eq("id", e.target.dataset.delDept);
+        if(error){ alert("خطأ بالحذف: " + error.message); return; }
+        await loadStructure(); render();
+      });
+      onAll("[data-del-year]", "click", async e=>{
+        const {error} = await sb.from("years").delete().eq("id", e.target.dataset.delYear);
+        if(error){ alert("خطأ بالحذف: " + error.message); return; }
+        await loadStructure(); render();
+      });
+      onAll("[data-add-dept]", "click", async e=>{
+        const collegeId = e.target.dataset.addDept;
+        const input = app.querySelector(`[data-new-dept="${collegeId}"]`);
+        const name = input.value.trim(); if(!name) return;
+        const {error} = await sb.from("departments").insert({college_id:collegeId, name, color:"#1C2B3A"});
+        if(error){ alert("خطأ بالإضافة: " + error.message); return; }
+        await loadStructure(); render();
+      });
+      onAll("[data-add-year]", "click", async e=>{
+        const deptId = e.target.dataset.addYear;
+        const input = app.querySelector(`[data-new-year="${deptId}"]`);
+        const name = input.value.trim(); if(!name) return;
+        const {error} = await sb.from("years").insert({department_id:deptId, name});
+        if(error){ alert("خطأ بالإضافة: " + error.message); return; }
+        await loadStructure(); render();
+      });
+    }
+  }
+}
+
+function _blankSel(){ return {_collegeId:"", _deptId:"", _yearId:""}; }
+function _selOrBlank(){ return S.sel && S.sel._collegeId!==undefined ? S.sel : _blankSel(); }
+
+/* ==================== استخراج البيانات من صورة عبر Gemini ==================== */
+async function runExtraction(type, inputSel){
+  const input = app.querySelector(inputSel);
+  const file = input?.files?.[0];
+  if(!file){ alert("اختر صورة أولاً"); return; }
+  S.busy = true; render();
+  try{
+    const base64 = await fileToBase64(file);
+    const res = await fetch(EDGE_FUNCTION_URL, {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+SUPABASE_ANON_KEY,
+        "apikey": SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ image_base64: base64, mime_type: file.type, extract_type: type }),
+    });
+    const json = await res.json();
+    if(json.error){ alert("صار خطأ: " + json.error); }
+    else { S.draft = { type, rows: json.rows || [] }; }
+  } catch(e){
+    alert("فشل الاتصال: " + e.message);
+  }
+  S.busy = false; render();
+}
+
+function fileToBase64(file){
+  return new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = ()=> resolve(r.result.split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+/* ==================== إقلاع التطبيق ==================== */
+(async function boot(){
+  await loadStructure();
+  S.view = "select";
+  render();
+})();
+</script>
+</body>
+</html>
