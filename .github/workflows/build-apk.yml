@@ -35,7 +35,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ تم العثور على ملف:"
+          echo "✅ تم العثور على:"
           echo "$ZIP_FILE"
 
           echo "ZIP_FILE=$ZIP_FILE" >> "$GITHUB_ENV"
@@ -70,13 +70,24 @@ jobs:
         run: |
           npm install
 
-      - name: تثبيت Capacitor Android
+      - name: تثبيت TypeScript
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          npm install --save-dev typescript
+
+      - name: تثبيت Capacitor
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           npm install @capacitor/core@^8.0.0
           npm install @capacitor/android@^8.0.0
           npm install @capacitor/splash-screen@^8.0.0
-          npm install -D @capacitor/cli@^8.0.0
+          npm install --save-dev @capacitor/cli@^8.0.0
+
+      - name: التحقق من TypeScript
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          npx tsc --version
+          npx cap --version
 
       - name: إنشاء تطبيق Android
         working-directory: ${{ env.PROJECT_DIR }}
@@ -95,7 +106,10 @@ jobs:
       - name: ضبط اسم التطبيق
         working-directory: ${{ env.PROJECT_DIR }}/android
         run: |
-          sed -i 's/<string name="app_name">.*<\/string>/<string name="app_name">دليل الطالب<\/string>/' app/src/main/res/values/strings.xml || true
+          if [ -f "app/src/main/res/values/strings.xml" ]; then
+            sed -i 's#<string name="app_name">.*</string>#<string name="app_name">دليل الطالب</string>#' \
+            app/src/main/res/values/strings.xml
+          fi
 
       - name: بناء APK
         working-directory: ${{ env.PROJECT_DIR }}/android
@@ -108,7 +122,7 @@ jobs:
         working-directory: ${{ env.PROJECT_DIR }}/android
         run: |
           echo "=============================="
-          echo "ملفات APK:"
+          echo "تم إنشاء APK"
           echo "=============================="
 
           find app/build/outputs/apk -type f -name "*.apk" -ls
